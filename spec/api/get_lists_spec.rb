@@ -39,4 +39,32 @@ RSpec.describe 'Todo Lists' do
 
         include_examples 'shared test cases'
     end
+
+    context "list item labels are unique in scope of a list" do
+        existing_list_items = JSON.parse((Faraday.get(BASE_URL+"/lists")).body)[0]["items"]
+        existing_list_item_name = existing_list_items[0]["label"]
+
+        Faraday.new(url: BASE_URL).post('/list/0/add', {"label": existing_list_item_name}.to_json)
+        new_list_items = JSON.parse((Faraday.get(BASE_URL+"/lists")).body)[0]["items"]   
+
+        let(:old_list_items) { existing_list_items }
+        let(:new_list_items) { new_list_items }
+
+        it 'retricts duplicate list items name' do
+            expect(check_duplicate(new_list_items)).to be_falsey
+        end
+    end
+
+end
+
+def check_duplicate list
+    visited = Set.new
+    list.each do |element|
+        if visited.include?(element)
+            return true
+        else
+            visited << element
+        end
+    end
+    return false
 end
