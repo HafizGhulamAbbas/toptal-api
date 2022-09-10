@@ -56,16 +56,13 @@ RSpec.describe 'Todo Lists' do
     end
 
     context "only completed List Items can be removed" do
-        # make item incomplete
         incomplete_item_response = Faraday.new(url: BASE_URL).post('/list/0/item/0/complete/false')
 
         let(:incomplete_item_response) { incomplete_item_response }
         let(:icomplete_item_label) { JSON.parse(incomplete_item_response.body)["label"]}
 
-        # delete item
         remove_list_item_response1 = Faraday.new(url: BASE_URL).delete('/list/0/item/0')
         let(:remove_list_item_response) { JSON.parse(remove_list_item_response1.body) }
-        # check if not exits
 
         it 'incomplete list item not deleted' do
             expect(remove_list_item_response).to include(icomplete_item_label)
