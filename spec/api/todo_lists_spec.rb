@@ -1,17 +1,24 @@
 RSpec.shared_examples 'shared test cases' do
-    # it 'returns 200 status code' do
-    #     expect(response_status).to eq(200)
-    # end
-
     it 'responds within 200ms' do
-        expect(time_taken*100).to be < 200
+        expect(time_taken*1000).to be < 200
     end
   end
 
 RSpec.describe 'Todo Lists' do
 
-    context "list names are unique" do
+    context "create new list" do
         BASE_URL = "http://localhost:4567"
+        list_name = "Onboaring"
+        new_list_response = Faraday.new(url: BASE_URL).post('/lists/add', {"name": list_name}.to_json)
+
+        let(:response_status) { new_list_response.status}
+        
+        it 'returns 200 status code' do
+            expect(response_status).to eq(200)
+        end
+    end
+
+    context "list names are unique" do
         list_name = Time.now
         new_list_response = Faraday.new(url: BASE_URL).post('/lists/add', {"name": list_name}.to_json)
         duplicate_list_response = Faraday.new(url: BASE_URL).post('/lists/add', {"name": list_name}.to_json)
@@ -69,16 +76,4 @@ RSpec.describe 'Todo Lists' do
         end
     end
 
-end
-
-def check_duplicate list
-    visited = Set.new
-    list.each do |element|
-        if visited.include?(element)
-            return true
-        else
-            visited << element
-        end
-    end
-    return false
 end
